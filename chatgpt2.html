@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" />    
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="chat-container">
+    <div class="header" id="myHeader">
+     <a href="index.html" style="float:left;color:white;margin-top:17px;margin-left:8px;margin-right:10px;"><i class="fa-solid fa-arrow-left fa-lg"></i></a>
+      <img src="img/robot2.jpg" id="myImg" alt="Robot" width="42px" height="42" style="border-radius:50%;float:left;margin-left:1rem;margin-top:0.5rem;">
+      <!-- The Modal -->
+    <div id="myModal" class="modal">
+      <span class="close">&times;</span>
+      <img class="modal-content" id="img01">
+      <div id="caption"></div>
+    </div>
+    <div>
+      <h3 style="float:left;margin-left:1rem;margin-top:0.5rem;">Chat-GPT2</h3>
+      <p style="float:left;margin-left:-6rem;margin-top:2.2rem;font-size:smaller;" id="subtext">offline</p>
+  </div>
+       <!-- <a href="player.html" style="float:center;margin-top:1rem;background-color:#009788;border:none;color:white;margin-right: 1rem;"><i class="fa-solid fa-radio fa-2xl"></i></a> -->
+        <!--<a href="#" style="float:right;margin-top:1rem;background-color:#009788;border:none;color:white;margin-right: 1rem;"><i class="fa-solid fa-ellipsis-vertical fa-xl"></i></a> -->
+        <!--div class="menu-nav">
+          <div class="menu-item"></div>
+          <div class="dropdown-container" tabindex="-1">
+            <div class="three-dots"></div>
+            <div class="dropdown">
+              <a href="player.html"><div>Radio</div></a>
+              <a href="#"><div>Settings</div></a>
+              <a href="#"><div>About</div></a>
+            </div>
+          </div>
+        </div>-->
+
+      </div>
+        <div class="chat-messages" onclick="dropbtnHide()">
+          <div class="message incoming">
+          </div>
+          <div class="message outgoing">
+          </div>
+        </div>
+        <div class="chat-input">
+          <div class="dropup">
+            <button class="dropbtn" onclick="dropbtn_click()"><i class="fa-solid fa-paperclip fa-xl" style="color:rgb(97, 96, 96);" id="pclip"></i></button>
+           <!-- <div class="dropup-content">
+              <a onclick="endp(1)" class="endpoint" id="1">Default<br>(text-davinci-003)</a>
+              <a onclick="endp(2)" class="endpoint" id="2">text-davinci-002</a>
+              <a onclick="endp(3)" class="endpoint" id="3">Curie</a>
+              <a onclick="endp(4)" class="endpoint" id="4">DALL-E<br>(Image)</a>
+            </div> -->
+          </div>
+          <input type="text" placeholder="Type your message here..." onfocus="dropbtnHide()">
+          <button id="myBtn" onclick="myFunction()"><img src="img/send.jpg" alt="" width="35" height="35"></button>
+       </div>
+      </div>
+      
+
+ <script>
+        var flag=0;
+        const messageInput = document.querySelector('.chat-input input');
+        const sendButton = document.querySelector('.chat-input button');
+        const chatMessages = document.querySelector('.chat-messages');
+        var endpoint = "https://api.openai.com/v1/engines/text-davinci-002/completions";
+        var api_key;
+    function myFunction() {
+        var messageText = messageInput.value.trim();
+        messageText=messageText.replaceAll("<","&lt;");
+        messageText= messageText.replaceAll(">","&gt;");
+        messageText=messageText.replaceAll("\"","&quot;");
+        messageText=messageText.replaceAll("\'","&apos;");
+        if (messageText != '') {
+        document.getElementById("myBtn").disabled = true;
+        const message = document.createElement('div');
+        message.classList.add('message', 'outgoing');
+        message.innerHTML = `
+        <div class="text1" onclick="cpymsg()">${messageText}</div>
+        `;
+        
+        chatMessages.appendChild(message);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        messageInput.value = '';
+
+        if (localStorage.getItem("text2") != null){
+          api_key = localStorage.getItem("text2");
+        }else{
+          alert("Set API Key in Settings");
+          window.location.href = "setting.html";
+        }
+
+        if(flag==1){
+          var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://api.openai.com/v1/images/generations",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer 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"
+            },
+            "data": JSON.stringify({
+                "model": "image-alpha-001",
+                "prompt": messageText,
+                "num_images": 1,
+                "size": "512x512",
+                "response_format": "url"
+            })
+        }
+
+        $.ajax(settings).done(function(response) {
+            var imageUrl = response.data[0].url;
+            const response1 = document.createElement('div');
+            response1.classList.add('message', 'incoming');
+            response1.innerHTML = `<div class="avatar"></div>
+            <div class="text"><input class="cpylabel" type="text" value="Chandan" readonly><button class="btn" onclick="copytext()"><i class="fa fa-clone"></i></button><div id="res_msg" style="overflow:hidden;font-size:0.01rem;"><img src="${imageUrl}" alt="" style="float:start;width:100%;height:100%;">${imageUrl}<textarea id="cpytxt">${imageUrl}</textarea></div></div>
+            `;
+            
+            chatMessages.appendChild(response1);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            document.getElementById("myBtn").disabled = false;
+            cpymsg();
+            copytext();
+          }).fail(function(error) {
+            alert(error);
+            document.getElementById("myBtn").disabled = false;
+        });
+
+        }
+        else{
+          $.ajax({
+            url: endpoint,
+            type: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + openai_api_key
+            },
+            data: JSON.stringify({
+                'prompt': messageText,
+                'max_tokens': 150,
+                'temperature': 0.5
+            }),
+           success: function(res) {
+                var text = res.choices[0].text.trim();
+                text=text.replaceAll("<","&lt;");
+                text= text.replaceAll(">","&gt;");
+                text=text.replaceAll("\"","&quot;");
+                text=text.replaceAll("\'","&apos;");
+                const response = document.createElement('div');
+                response.classList.add('message', 'incoming');
+                response.innerHTML = `<div class="avatar"></div>
+                <div class="text" style="white-space:pre-line;word-wrap: break-word;"><input class="cpylabel" type="text" value="Chandan" readonly><button class="btn" onclick="copytext()"><i class="fa fa-clone"></i></button><div id="res_msg">${text}<textarea id="cpytxt">${text}</textarea></div></div>
+                `;
+                
+                chatMessages.appendChild(response);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                document.getElementById("myBtn").disabled = false;
+               cpymsg();
+               copytext();
+            },
+            error: function() {
+                var er = "Error communicating with API";
+                alert(er)
+                document.getElementById("myBtn").disabled = false;
+            }
+            });
+         }
+        }
+      }
+  
+      
+
+      function copytext(){
+        if (document.querySelector('.btn')) {
+          // select all buttons, each as el
+          document.querySelectorAll('.btn').forEach(function(el) {
+            // bind click event to each el
+            el.addEventListener('click', function (e) {
+              // check also if there is at least on .childelement
+              // e.target is the clicked element, parentNode the parent, from there find .childElement
+              if (e.target.parentNode.querySelector('.incoming')) {
+                e.target.parentNode.querySelector('.incoming').classList.add('Example');
+              }
+              else {
+               var x = e.target.parentNode.innerText;
+               $("textarea").css("display","block");
+               $("textarea").text(x);
+                $("textarea").select();
+                document.execCommand("copy");
+                $("textarea").css("display","none");
+              }
+              
+            });
+        
+           });
+          }
+      }
+
+      function cpymsg(){
+        if (document.querySelector('.text1')) {
+          // select all buttons, each as el
+          document.querySelectorAll('.text1').forEach(function(el) {
+            // bind click event to each el
+            el.addEventListener('click', function (e){
+              // check also if there is at least on .childelement
+              // e.target is the clicked element, parentNode the parent, from there find .childElement
+              if (e.target.parentNode.querySelector('.outgoing')) {
+                e.target.parentNode.querySelector('.outgoing').classList.add('Example1');
+              }
+              else{
+               var x = e.target.parentNode;
+               $("textarea").css("display","block");
+               $("textarea").text(x.innerText);
+                $("textarea").select();
+                document.execCommand("copy");
+                $("textarea").css("display","none");
+                x.style.color="red";
+                const tm = setTimeout(change,1500);
+                function change(){
+                  x.style.color="black";
+                }
+              }
+            });
+           });
+          }
+      }
+
+    function dropbtn_click(){
+      var dis = document.querySelector(".dropup-content").style.display;
+      if(dis==="none" || dis==""){
+        document.querySelector(".dropup-content").style.display="block";
+        document.querySelector(".dropbtn").style.backgroundColor="#009788";
+        document.querySelector("#pclip").style.color="white";
+      }
+      else{
+        document.querySelector(".dropup-content").style.display="none";
+        document.querySelector(".dropbtn").style.backgroundColor="white";
+        document.querySelector("#pclip").style.color="rgb(97, 96, 96)";
+      }
+    }
+    
+    function dropbtnHide(){
+      if(document.querySelector(".dropup-content").style.display==="block"){
+        document.querySelector(".dropup-content").style.display="none";
+        document.querySelector(".dropbtn").style.backgroundColor="white";
+        document.querySelector("#pclip").style.color="rgb(97, 96, 96)";
+      }
+    }
+   
+  
+
+    var modal = document.getElementById("myModal");
+
+    //Get the image and insert it inside the modal - use its "alt" text as a caption
+    var img = document.getElementById("myImg");
+    var modalImg = document.getElementById("img01");
+    var captionText = document.getElementById("caption");
+    img.onclick = function(){
+      modal.style.display = "block";
+      modalImg.src = this.src;
+      captionText.innerHTML = this.alt;
+    }
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() { 
+      modal.style.display = "none";
+    }
+ </script>
+      
+</body>
+</html>

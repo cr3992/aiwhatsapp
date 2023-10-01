@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" />    
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="index.css">
+    <style>
+       #chat-container{
+        background-color:#fffd;
+       } 
+       .chat-container {
+        margin-top: 50px; /* Adjust this value as needed to avoid overlapping with the fixed header */
+        overflow-y: auto; /* Enables vertical scrolling */
+        max-height: calc(110vh - 60px); /* Limits the maximum height of the scrollable area */
+    }
+    
+       .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: bold;
+    }
+    .form-group input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .save-button {
+        display: block;
+        width: 50%;
+        padding: 10px;
+        background-color: #009688;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 25%;
+    }
+    .form-container{
+        padding: 20px;
+        border:1px solid gray;
+        margin:1rem;
+        border-radius: 10px;
+    }
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #009688;
+        color: white;
+        padding: 10px;
+        z-index: 1; /* Ensures the header is above the scrollable content */
+    }
+    
+    </style>
+</head>
+<body onload="loadSaveData()">
+ <div id="chat-container">
+  <div class="chat-container">
+    <div class="header" id="myHeader">
+        <a href="index.html" style="float:left;color:white;margin-top:20px;margin-left:8px;margin-right:10px;"><i class="fa-solid fa-arrow-left fa-lg"></i></a>
+        <h3 style="float:left;margin-left:1rem;color:white;">Settings</h3>
+      </div>
+        <div class="form-container">
+            <form id="myForm">
+                <h3 style="text-align:center;">API Keys</h3>
+                <div class="form-group">
+                    <label for="input1">Chat-GPT3</label>
+                    <input type="text" id="input1" name="text1">
+                </div>
+                <div class="form-group">
+                    <label for="input2">Chat-GPT2</label>
+                    <input type="text" id="input2" name="text2">
+                </div>
+                <div class="form-group">
+                    <label for="input4">Image Generation</label>
+                    <input type="text" id="input3" name="text4">
+                </div>
+                <div class="form-group">
+                    <label for="input5">Dall-E Image</label>
+                    <input type="text" id="input4" name="text5">
+                </div>
+                <button type="button" class="save-button" onclick="saveFormData()">Save</button>
+            </form>
+        </div>
+
+        <div class="form-container" >
+            <h3 style="text-align:center;">Get API Keys</h3>
+            <small><i>click on link to copy</i></small>
+                <ul class="form-group">
+                    <li>Chat-GPT3 <span><input type="text" id="input10" value="https://platform.openai.com/" readonly onclick="copyToClipboard('input10')"></span></li><br>
+                    <li>Chat-GPT2 <span><input type="text" id="input20" value="https://platform.openai.com/" readonly onclick="copyToClipboard('input20')"></span></li><br>
+                    <li>Image Generation <span><input type="text" id="input30" value="https://stablediffusionapi.com/" readonly onclick="copyToClipboard('input30')"></span></li><br>
+                    <li>Dall-E Image <span><input type="text" id="input40" value="https://platform.openai.com/" readonly onclick="copyToClipboard('input40')"></span></li>
+                </ul>
+        </div>
+         
+        </div>
+        
+      
+
+<script>
+    function saveFormData() {
+        const form = document.getElementById('myForm');
+        const formData = new FormData(form);
+        const formDataObject = {};
+        
+        formData.forEach((value, key) => {
+            localStorage.setItem(key,value);
+        });
+        alert("Data Saved");
+    }
+    function loadSaveData(){
+        if (localStorage.getItem("text1")!=null){
+            for(let i=1;i<=5;i++){
+                document.getElementById("input"+i).value = localStorage.getItem("text"+i);
+            }
+        }
+    }
+    function copyToClipboard(inputId) {
+        const inputElement = document.getElementById(inputId);
+        inputElement.select();
+        document.execCommand('copy');
+        alert(`Copied: ${inputElement.value}`);
+    }
+</script>
+      
+</body>
+</html>
